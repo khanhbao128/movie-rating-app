@@ -28,8 +28,19 @@ def index():
 def user_list():
     """Show list of users"""
     users = User.query.all()
-    print(users)
     return render_template('user_list.html', users=users)
+
+@app.route('/register')
+def register_form():
+    """Display a registration form to the users"""
+    return render_template('register_form.html')
+
+@app.route('/register', methods=['POST'])
+def show_register():
+    """Display users' log in info and verify them"""
+    username = request.form['username']
+    print(username)
+
 
 
 

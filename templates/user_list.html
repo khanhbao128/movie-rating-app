@@ -1,4 +1,4 @@
-{% extends base.html %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -7,9 +7,11 @@
         {% for user in users %}
             <li>
                 <a href=/users/{{ user.user_id }}>
-                    {{ user.email }} ({{ user.user_id }})
+                    ID: {{ user.user_id }}
+                    Age: {{ user.age }} Email: {{ user.email }} 
                 </a>
             </li>
         {% endfor %}
     </ul>
+
 {% endblock %}

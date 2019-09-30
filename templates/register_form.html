@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class='content'>
+        <form action='/register' method='POST'>
+
+            <div class='username'>
+                <label for = 'Username'>Username:</label>
+                <input name='username' type='text'>
+            </div>
+
+            <div class="password">
+                <label for='Password'>Password:</label>
+                <input name='password' type='password'>
+            </div>
+
+            <div class='submit_button'>
+                <input type='submit' value='Log In'>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
