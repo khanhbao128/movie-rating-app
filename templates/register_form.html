@@ -1,21 +1,41 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class='content'>
-        <form action='/register' method='POST'>
 
-            <div class='username'>
-                <label for = 'Username'>Username:</label>
-                <input name='username' type='text'>
+    <h2>Register</h2>
+
+    <div class='content'>
+        <form action='register' method='POST'>
+
+            <div class='email'>
+                <label>
+                    Email:
+                    <input name='email' type='email' required>
+                </label>
             </div>
 
             <div class="password">
-                <label for='Password'>Password:</label>
-                <input name='password' type='password'>
+                <label>Password:
+                <input name='password' type='password' required>
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    Age:
+                    <input name='age' type='number'>
+                </label>
+            </div>
+
+            <div>
+                <label>
+                    Zipcode:
+                    <input name="zipcode" type='text'>
+                </label>
             </div>
 
             <div class='submit_button'>
-                <input type='submit' value='Log In'>
+                <input type='submit' value='Register'>
             </div>
 
         </form>

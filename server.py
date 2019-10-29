@@ -24,11 +24,6 @@ def index():
     """Homepage."""
     return render_template('homepage.html')
 
-@app.route('/users')
-def user_list():
-    """Show list of users"""
-    users = User.query.all()
-    return render_template('user_list.html', users=users)
 
 @app.route('/register')
 def register_form():
@@ -36,11 +31,136 @@ def register_form():
     return render_template('register_form.html')
 
 @app.route('/register', methods=['POST'])
-def show_register():
-    """Display users' log in info and verify them"""
-    username = request.form['username']
-    print(username)
+def register_user():
+    """Verify user's info"""
+    email = request.form.get('email')
+    password = request.form.get('password')
+    age = request.form.get('age')
+    zipcode = request.form.get('zipcode')
 
+    # check user's email to see if that user already exists in the database
+    user = User.query.filter_by(email=email).first()
+    # if user exists, check to see if the password entered matches the database password
+    if user:
+        flash("This user already exists. Please login.")
+        return redirect('/login')
+    else:
+        new_user = User(email=email, password=password, age=age, zipcode=zipcode)
+        db.session.add(new_user)
+        db.session.commit()
+        flash(f"User {email} added.")
+        return redirect('/')
+
+@app.route('/login')
+def login():
+    """Show log in page"""
+
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def verify_user():
+    """Verify if users info is correct and log them in"""
+
+    #get info from users inputs
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    #check to see if user exists
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        #check if password matches database
+        if password == user.password:
+            session['user_id'] = user.user_id
+            flash(f'{email} logged in')
+            return redirect (f'/users/{user.user_id}')
+        else:
+            flash('Sorry the password is incorrect. Please enter the right password to login')
+            return redirect('/login')
+    else:
+        flash("No user exists. Please login again")
+        return redirect('/login')
+
+@app.route('/logout')
+def logout():
+    """"Log out"""
+
+    del session['user_id']
+    flash("Logged Out")
+    return redirect('/')
+
+@app.route('/users')
+def user_list():
+    """Show list of users"""
+
+    users = User.query.all()
+    return render_template('user_list.html', users=users)
+
+@app.route('/users/<user_id>')
+def show_user(user_id):
+    """Show info of one particular user"""
+
+    user = User.query.filter_by(user_id=user_id).first()
+    return render_template('user.html', user=user)
+
+
+@app.route('/movies')
+def movie_list():
+    """Show list of movies"""
+
+    movies = Movie.query.order_by('title').all()
+    return render_template('movie_list.html', movies=movies)      
+
+@app.route('/movies/<movie_id>')
+def show_movie(movie_id):
+    """"Show info about movie
+
+    If a user is logged in, let them add or edit a rating
+    """
+
+    movie = Movie.query.get(movie_id)
+
+    user_id = session.get('user_id')
+
+    if user_id:
+        user_rating = Rating.query.filter_by(movie_id=movie_id, user_id=user_id).first()
+
+    else:
+        user_rating = None
+
+    return render_template('movie.html', 
+                            movie=movie, 
+                            user_rating=user_rating)   
+
+@app.route('/movies/<movie_id>', methods=['POST'])
+def add_update_rating(movie_id):
+    """Add or update a rating"""
+
+    score = request.form.get('score')
+
+    user_id = session.get('user_id')
+
+    if not user_id:
+        raise Exception('No user logged in.')
+
+    rating = Rating.query.filter_by(user_id=user_id)
+    
+    if rating:
+        rating.score = score
+        flash("Rating updated.")
+    else:
+        rating = Rating(user_id=user_id, movie_id=movie_id, score=score)
+        flash("Rating added.")
+        db.session.add(rating)
+
+    db.session.commit()
+
+    return redirect(f'/movies/{movie_id}')
+
+
+
+
+   
 
 
 
