@@ -18,6 +18,11 @@
         </ul>
     {% endif %}
 
+
+    <!-- {% if prediction %}
+      <p>We predict you will rate this movie {{ prediction }}.</p>
+    {% endif %} -->
+
     {% if "user_id" in session %}
         <h2>Your Rating</h2>
         {% if user_rating %}
