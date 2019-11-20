@@ -78,7 +78,7 @@ def verify_user():
             flash('Sorry the password is incorrect. Please enter the right password to login')
             return redirect('/login')
     else:
-        flash("No user exists. Please login again")
+        flash("This user does not exists.")
         return redirect('/login')
 
 @app.route('/logout')
@@ -128,9 +128,45 @@ def show_movie(movie_id):
     else:
         user_rating = None
 
+    # return render_template('movie.html', 
+    #                         movie=movie, 
+    #                         user_rating=user_rating)   
+
+    # Get average rating of movie
+
+    rating_scores = [r.score for r in movie.ratings]
+    avg_rating = float(sum(rating_scores)) / len(rating_scores)
+
+    prediction = None
+
+    # Prediction code: only predict if the user hasn't rated it.
+
+    if (not user_rating) and user_id:
+        user = User.query.get(user_id)
+        if user:
+            prediction = user.predict_rating(movie)
+
+    # Either use the prediction or their real rating
+
+    if prediction:
+        # User hasn't scored; use our prediction if we made one
+        effective_rating = prediction
+
+    elif user_rating:
+        # User has already scored for real; use that
+        effective_rating = user_rating.score
+
+    else:
+        # User hasn't scored, and we couldn't get a prediction
+        effective_rating = None
+
+
     return render_template('movie.html', 
                             movie=movie, 
-                            user_rating=user_rating)   
+                            user_rating=user_rating,
+                            prediction=prediction)   
+
+
 
 @app.route('/movies/<movie_id>', methods=['POST'])
 def add_update_rating(movie_id):
@@ -161,7 +197,6 @@ def add_update_rating(movie_id):
 
 
    
-
 
 
 if __name__ == "__main__":
